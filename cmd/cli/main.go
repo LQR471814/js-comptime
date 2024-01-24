@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -9,11 +10,10 @@ import (
 
 	sitter "github.com/smacker/go-tree-sitter"
 	"github.com/smacker/go-tree-sitter/javascript"
-	v8 "rogchap.com/v8go"
 )
 
 func main() {
-	jsctx := v8.NewContext()
+	// jsctx := v8.NewContext()
 
 	buff, err := io.ReadAll(os.Stdin)
 	if err != nil {
@@ -27,8 +27,10 @@ func main() {
 		log.Fatal(err)
 	}
 
+	runBuff := bytes.NewBuffer(nil)
+
 	iterator := sitter.NewIterator(tree.RootNode(), sitter.DFSMode)
-	err = iterator.ForEach(func(n *sitter.Node) error {
+	iterator.ForEach(func(n *sitter.Node) error {
 		if n.ChildCount() == 0 {
 			return nil
 		}
@@ -40,23 +42,26 @@ func main() {
 			label := n.ChildByFieldName("label").Content(buff)
 			body := n.ChildByFieldName("body")
 			if label == "$comptime" {
-				fmt.Println("COMPTIME ---------")
-				fmt.Println(body.Type(), body.Content(buff))
+				bodyType := body.Type()
+				bodyContent := body.Content(buff)
 
-				switch body.Type() {
+				// fmt.Println("COMPTIME ---------")
+				// fmt.Println(bodyType, bodyContent)
+
+				switch bodyType {
 				case "expression_statement":
-					// TODO: add more meaningful errors later
-					_, err := jsctx.RunScript(body.Content(buff), "<comptime code>")
-					if err != nil {
-						return err
-					}
+					runBuff.Write([]byte(bodyContent + "\n"))
+					// // TODO: add more meaningful errors later
+					// _, err := jsctx.RunScript(bodyContent, "<comptime code>")
+					// if err != nil {
+					// 	return err
+					// }
 				}
 			}
 		}
 
 		return nil
 	})
-	if err != nil {
-		log.Fatal(err)
-	}
+
+	fmt.Println(runBuff.String())
 }
