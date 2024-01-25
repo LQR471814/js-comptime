@@ -1,4 +1,4 @@
-$comptime: import { readFileSync as comptimeReadFileSync } from "fs"
+$comptime: const { readFileSync: comptimeReadFileSync, access } = await import("fs")
 
 $comptime: function comptimeFibonacci(n) {
   let a = 0
@@ -12,6 +12,9 @@ $comptime: function comptimeFibonacci(n) {
 }
 
 $comptime: const unlabeledVariable = 48484848
+$comptime: const a = 48484848, b = 3
+$comptime: let x
+$comptime: const [y, z] = [4, 3]
 
 console.log(
   "this is an inlined variable + the 32nd fibonacci number",
