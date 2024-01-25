@@ -36,7 +36,6 @@ function runtimeFunction() {
   }
 
   const runtimeValue = expensiveMath(1)
-
   return [x + runtimeValue, update()]
 }
 
