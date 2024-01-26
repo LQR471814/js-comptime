@@ -1,14 +1,23 @@
-$comptime: 24
-$comptime: console.log("any expression can be used in comptime, it will be expunged in the runtime code.")
-$comptime: {
-  console.log("multiple lines can be used")
-  console.log("with the power of the usually rarely useful javascript scope")
+$comptime: const comptimeVar = 24
+$comptime: function comptimeFunction(a, b) {
+  return n ** 2
 }
+$comptime: const comptimeKey = "foo"
 
-function subScope() {
-  $comptime: console.log("comptime can be used anywhere.")
-}
-
-$comptime: (function() {
-  $comptime: console.log("$comptime cannot be used within $comptime, I don't want to implement it, and if you need this, you're probably abusing comptime.")
-})()
+comptimeVar
+comptimeVar = 32
+const arrayLiteral = [comptimeVar, 42]
+const objectLiteral = { comptimeVar, [comptimeKey]: comptimeVar }
+comptimeFunction(42, comptimeVar)
+43 + comptimeVar
+comptimeKey in objectLiteral
+comptimeVar % 2 === 0 ? comptimeKey : undefined
+comptimeVar, 32
+(comptimeVar, 32)
+`format string ${comptimeVar} ${32}`
+(() => comptimeVar * 3)()
+objectLiteral.foo
+objectLiteral[comptimeKey]
+comptimeVar++
+comptimeVar += 1
+delete objectLiteral[comptimeKey]

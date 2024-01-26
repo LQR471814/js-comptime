@@ -1,6 +1,6 @@
 ## js-comptime
 
-> A transpiler which adds "comptime" aka. "compile-time evaluation" aka. "partial evaluation" to javascript.
+> A transpiler which adds compile-time evaluation, or partial evaluation to JavaScript.
 
 Examples of how it should be used can be found under [examples](examples/)
 
@@ -56,6 +56,8 @@ console.log(obj.a.b)
 console.log(44)
 console.log("foo")
 ```
+
+> The reason why `console.log(...)` isn't also executed at compile time and the build result being an empty file is because one of its dependencies is the runtime function `console.log`. Obviously, the dependencies of a function execution also include the function being executed. Operations like `+` and `-` can be considered constant, but something like `console.log` which pertains to the execution environment cannot be considered constant.
 
 Objects and arrays can also be returned by `$comptime`, however all their properties/elements must also be inlined.
 
@@ -113,8 +115,40 @@ fooPrinter()
 1. Detect all "comptime regions", runtime operations/expressions which only rely on comptime values (from current or parent scopes) or constants.
 1. Execute "comptime values" and "comptime regions" while inlining the result of "comptime regions" in their appropriate areas in order from top to bottom.
 
+### Notes
+
+The list of expressions were taken from [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators).
+
+| Constant | Example |
+| --- | --- |
+| Null | `null` |
+| undefined | `undefined` |
+| Any number literal | `23` or `-42.3` |
+| Any string literal | `"a string"` or `'another string'` |
+| Boolean | `true` or `false` |
+
+| Expression | Example |
+| --- | --- |
+| Identifier reference | `variableIdentifier` |
+| Assignment | `v = <expr>` or `v++` or `v += <expr>` |
+| Array literal | `[1, 2]` |
+| Object literal | `{ foo: "bar" }` |
+| Function call | `func(arg1, ...)` or `(expr)(arg1, ...)` |
+| Binary expression | `<expr> + <expr>` or `<expr> in <expr>` |
+| Ternary operator | `<expr> ? <expr> : <expr>` |
+| Comma operator | `<expr>, <expr>` |
+| Grouping operator | `(<expr>)` |
+| Format string | ```hello ${<expr>}``` |
+| Function definition | `function name(arg1, arg2) { <expr>; ... }` or `() => { <expr> }` |
+
 ### Configuration
 
 - Entrypoint(s) can be configured.
 - Inlining code in `node_modules` is disabled by default. A whitelist and blacklist with glob support can be provided.
 - The runtime in which `$comptime` code is executed can be configured. (ex. nodejs, browser window, etc...)
+
+### Credits
+
+Ideas of comptime are nothing new, attempts at JavaScript comptime like [vite-plugin-compile-time](https://github.com/egoist/vite-plugin-compile-time) already exist. Various ideas from metaprogramming in other languages (like generics/comptime, code generation, introspection) mixed with an unhealthy dose of JavaScript programming culminated into this thing.
+
+MDN's [article](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators) on expressions was pretty helpful.
