@@ -18,18 +18,18 @@ const (
 )
 
 type RegularStatement struct {
-	Text string
+	Text *sitter.Node
 }
 
 type VarDeclarations struct {
 	Identifiers []string
-	Text        string
+	Text        *sitter.Node
 }
 
 type Region struct {
 	// these only refer to comptime dependencies
 	Dependencies []string
-	Text         string
+	Node         *sitter.Node
 }
 
 type StatementRef struct {
@@ -49,6 +49,10 @@ type Scope struct {
 }
 
 func recurse(n *sitter.Node, scope *Scope, source []byte) *Region {
+  if isConstant(n) {
+    
+  }
+
 	isExpression := false
 	nodeType := n.Type()
 	if nodeType == "labeled_statement" {
@@ -56,13 +60,11 @@ func recurse(n *sitter.Node, scope *Scope, source []byte) *Region {
 		label := n.ChildByFieldName("label").Content(source)
 		body := n.ChildByFieldName("body")
 		if label == "$comptime" {
-			content := body.Content(source)
-
 			switch body.Type() {
 			case "lexical_declaration":
 				scope.Declarations = append(scope.Declarations, VarDeclarations{
 					Identifiers: parseLexicalDecl(body, source),
-					Text:        content,
+					Text:        body,
 				})
 				scope.StatementList = append(scope.StatementList, StatementRef{
 					Type:  STATEMENT_DECLARATION,
@@ -71,7 +73,7 @@ func recurse(n *sitter.Node, scope *Scope, source []byte) *Region {
 			case "function_declaration":
 				scope.Declarations = append(scope.Declarations, VarDeclarations{
 					Identifiers: []string{body.ChildByFieldName("name").Content(source)},
-					Text:        content,
+					Text:        body,
 				})
 				scope.StatementList = append(scope.StatementList, StatementRef{
 					Type:  STATEMENT_DECLARATION,
@@ -79,7 +81,7 @@ func recurse(n *sitter.Node, scope *Scope, source []byte) *Region {
 				})
 			default:
 				scope.Regular = append(scope.Regular, RegularStatement{
-					Text: content,
+					Text: body,
 				})
 				scope.StatementList = append(scope.StatementList, StatementRef{
 					Type:  STATEMENT_REGULAR,
@@ -91,7 +93,8 @@ func recurse(n *sitter.Node, scope *Scope, source []byte) *Region {
 		isExpression = true
 	}
 
-	constantChildren := true
+  comptimeRegions := []Region{}
+  constantChildren := true
 	for i := 0; i < int(n.ChildCount()); i++ {
 		childScope := scope
 		childNode := n.Child(i)
@@ -115,17 +118,23 @@ func recurse(n *sitter.Node, scope *Scope, source []byte) *Region {
 			}
 		}
 
-		comptimeRegion := recurse(childNode, childScope, source)
-		if comptimeRegion != nil {
-
+		region := recurse(childNode, childScope, source)
+		if region != nil {
+      // on comptime region
+      comptimeRegions = append(comptimeRegions, *region)
 		} else if !isConstant(childNode) {
+      // on non-constant non-comptime child
 			constantChildren = false
 		}
 	}
 
-	if constantChildren && isExpression {
-		return &Region{}
-	}
+  // boundary is reached
+  if !constantChildren  {
+    
+  }
+
+  // expression can be comptime evaluated
+  
 
 	return nil
 }
