@@ -6,9 +6,11 @@ Examples of how it should be used can be found under [examples](examples/)
 
 ### Tour
 
-The primary addition the `js-comptime` compiler adds to javascript is the `$comptime` label. "comptime" is essentially the execution of code at compile-time instead of runtime.
+The `js-comptime` compiler adds metaprogramming capabilities to javascript via the `$comptime` label.
 
-You can add the `$comptime` [label](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/label) before most javascript statements to have them execute at compile time.
+#### Code execution
+
+You can add the `$comptime` [label](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/label) before a block or an expression to have it only execute during compile time.
 
 ```js
 // before build
@@ -16,12 +18,19 @@ $comptime: console.log("this debug line will only be shown when comptime compile
 console.log("hello world")
 ```
 
+```
+// during build
+this debug line will only be shown when comptime compiles the application
+```
+
 ```js
 // after build
 console.log("hello world")
 ```
 
-You can reference variables and functions defined in `$comptime` from "runtime" code and the value they evaluate to will be inlined.
+#### Variable declaration
+
+If a variable, function or class is defined right after the `$comptime` label, they can be referenced from runtime code and they'll be inlined with the value they evaluate to during compile time.
 
 ```js
 // before build
@@ -106,6 +115,56 @@ fooPrinter()
 // after build
 const fooPrinter = () => console.log("foobarfoobar")
 fooPrinter()
+```
+
+#### Conditional generation
+
+Code can also be generated conditionally with `if-statements`, the body of the if statement is treated as runtime code, the expression is a comptime statement that determines if the runtime code will be generated or not. To ensure that variables don't conflict with the outside scope, generated code will always be wrapped in a `{ scope }`.
+
+```js
+// before build
+$comptime: const verbose = process.env.VERBOSE
+$comptime: if (verbose === "true") {
+  console.log("verbose logging...")
+}
+console.log("hello world")
+```
+
+```js
+// after build VERBOSE=true
+{
+  console.log("verbose logging...")
+}
+console.log("hello world")
+```
+
+```js
+// after build VERBOSE=false
+console.log("hello world")
+```
+
+Code can also be generated repeatedly with `for/while` loops, similarly, generated code will be wrapped in a `{ scope }`.
+
+```js
+// before build
+const db = someOrm(...)
+$comptime: const tableNames = ["user", "student", "teacher"]
+$comptime: for (const table of tableNames) {
+  db.delete(table).run()
+}
+```
+
+```js
+// after build
+{
+  db.delete("user").run()
+}
+{
+  db.delete("student").run()
+}
+{
+  db.delete("teacher").run()
+}
 ```
 
 ### Implementation
