@@ -1,4 +1,4 @@
-module js-comptime
+module jscomptime
 
 go 1.21.1
 

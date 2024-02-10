@@ -1,0 +1,185 @@
+<program>
+  <labeled_statement>
+    label: <statement_identifier />
+    body: <lexical_declaration>
+      kind: <variable_declarator>
+        name: <object_pattern>
+          <pair_pattern>
+            key: <property_identifier />
+            value: <identifier />
+          </pair_pattern>
+          <shorthand_property_identifier_pattern />
+        </object_pattern>
+        value: <await_expression>
+          <call_expression>
+            function: <import>
+            </import>
+            arguments: <arguments>
+              <string>
+                <string_fragment />
+              </string>
+            </arguments>
+          </call_expression>
+        </await_expression>
+      </variable_declarator>
+    </lexical_declaration>
+  </labeled_statement>
+  <labeled_statement>
+    label: <statement_identifier />
+    body: <function_declaration>
+      name: <identifier />
+      parameters: <formal_parameters>
+        <identifier />
+      </formal_parameters>
+      body: <statement_block>
+        <lexical_declaration>
+          kind: <variable_declarator>
+            name: <identifier />
+            value: <number />
+          </variable_declarator>
+        </lexical_declaration>
+        <lexical_declaration>
+          kind: <variable_declarator>
+            name: <identifier />
+            value: <number />
+          </variable_declarator>
+        </lexical_declaration>
+        <for_statement>
+          initializer: <lexical_declaration>
+            kind: <variable_declarator>
+              name: <identifier />
+              value: <number />
+            </variable_declarator>
+          </lexical_declaration>
+          condition: <expression_statement>
+            <binary_expression>
+              left: <identifier />
+              operator: right: <identifier />
+            </binary_expression>
+          </expression_statement>
+          increment: <update_expression>
+            argument: <identifier />
+            operator:</update_expression>
+          body: <statement_block>
+            <lexical_declaration>
+              kind: <variable_declarator>
+                name: <identifier />
+                value: <identifier />
+              </variable_declarator>
+            </lexical_declaration>
+            <expression_statement>
+              <assignment_expression>
+                left: <identifier />
+                right: <binary_expression>
+                  left: <identifier />
+                  operator: right: <identifier />
+                </binary_expression>
+              </assignment_expression>
+            </expression_statement>
+            <expression_statement>
+              <assignment_expression>
+                left: <identifier />
+                right: <identifier />
+              </assignment_expression>
+            </expression_statement>
+          </statement_block>
+        </for_statement>
+        <return_statement>
+          <identifier />
+        </return_statement>
+      </statement_block>
+    </function_declaration>
+  </labeled_statement>
+  <labeled_statement>
+    label: <statement_identifier />
+    body: <lexical_declaration>
+      kind: <variable_declarator>
+        name: <identifier />
+        value: <number />
+      </variable_declarator>
+    </lexical_declaration>
+  </labeled_statement>
+  <labeled_statement>
+    label: <statement_identifier />
+    body: <lexical_declaration>
+      kind: <variable_declarator>
+        name: <identifier />
+        value: <number />
+      </variable_declarator>
+      <variable_declarator>
+        name: <identifier />
+        value: <number />
+      </variable_declarator>
+    </lexical_declaration>
+  </labeled_statement>
+  <labeled_statement>
+    label: <statement_identifier />
+    body: <lexical_declaration>
+      kind: <variable_declarator>
+        name: <identifier />
+      </variable_declarator>
+    </lexical_declaration>
+  </labeled_statement>
+  <labeled_statement>
+    label: <statement_identifier />
+    body: <lexical_declaration>
+      kind: <variable_declarator>
+        name: <array_pattern>
+          <identifier />
+          <identifier />
+        </array_pattern>
+        value: <array>
+          <number />
+          <number />
+        </array>
+      </variable_declarator>
+    </lexical_declaration>
+  </labeled_statement>
+  <expression_statement>
+    <call_expression>
+      function: <member_expression>
+        object: <identifier />
+        property: <property_identifier />
+      </member_expression>
+      arguments: <arguments>
+        <string>
+          <string_fragment />
+        </string>
+        <binary_expression>
+          left: <identifier />
+          operator: right: <call_expression>
+            function: <identifier />
+            arguments: <arguments>
+              <number />
+            </arguments>
+          </call_expression>
+        </binary_expression>
+      </arguments>
+    </call_expression>
+  </expression_statement>
+  <expression_statement>
+    <call_expression>
+      function: <member_expression>
+        object: <identifier />
+        property: <property_identifier />
+      </member_expression>
+      arguments: <arguments>
+        <string>
+          <string_fragment />
+        </string>
+        <call_expression>
+          function: <identifier />
+          arguments: <arguments>
+            <string>
+              <string_fragment />
+            </string>
+            <string>
+              <string_fragment />
+            </string>
+          </arguments>
+        </call_expression>
+      </arguments>
+    </call_expression>
+  </expression_statement>
+</program>
+

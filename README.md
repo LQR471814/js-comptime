@@ -1,4 +1,4 @@
-## js-comptime
+## jscomptime
 
 > A transpiler which adds compile-time evaluation, or partial evaluation to JavaScript.
 
@@ -6,7 +6,7 @@ Examples of how it should be used can be found under [examples](examples/)
 
 ### Tour
 
-The `js-comptime` compiler adds metaprogramming capabilities to javascript via the `$comptime` label.
+The `jscomptime` compiler adds metaprogramming capabilities to javascript via the `$comptime` label.
 
 #### Code execution
 
@@ -173,6 +173,28 @@ $comptime: for (const table of tableNames) {
 1. Detect all "comptime values", variable or function declarations preceded by the `$comptime:` label.
 1. Detect all "comptime regions", runtime operations/expressions which only rely on comptime values (from current or parent scopes) or constants.
 1. Execute "comptime values" and "comptime regions" while inlining the result of "comptime regions" in their appropriate areas in order from top to bottom.
+
+#### In detail
+
+A "scope" tree is created, each node holding the comptime and runtime variables declared in the scope, the comptime statements within the scope, and child scopes to the current scope.
+
+A child scope is created when the following are encountered:
+- A lexical block `{ statement; }`, in this case a new empty scope is created.
+- A function declaration `function (arg1, arg2) { ... }`, in this case a new empty scope is created and the function arguments are used as runtime declarations.
+- A arrow function `(arg1, arg2) => { ... }`, this is the same as a function declaration.
+- A method declaration `name(arg1, arg2) { ... }`, this is the same as a function declaration.
+
+A "variable declaration" is:
+- A lexical variable declaration.
+- A function declaration.
+- A class declaration.
+
+`this` is always treated as a runtime value, trying to assign `this.<something>` within `$comptime` will shoot you in the foot.
+
+A "comptime value" is a "variable declaration" which is labeled with `$comptime`.
+
+A "comptime region" is an expression in which all children are comptime. Children which are exempt from a comptime/runtime label are the following:
+- `name: <identifier>`
 
 ### Notes
 

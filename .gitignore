@@ -1,3 +1,4 @@
 include
 libv8
 .vscode
+*.log

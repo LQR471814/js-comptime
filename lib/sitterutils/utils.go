@@ -1,23 +1,30 @@
 package sitterutils
 
 import (
+	"fmt"
 	"strings"
 
 	sitter "github.com/smacker/go-tree-sitter"
 )
 
-func Format(node *sitter.Node, depth int) string {
+func Format(node *sitter.Node, depth int, onlyNamed bool) string {
 	if node.ChildCount() == 0 {
 		return "<" + node.Type() + " />\n"
 	}
 
 	text := "<" + node.Type() + ">\n  "
 	for i := 0; i < int(node.ChildCount()); i++ {
-		fieldName := node.FieldNameForChild(i)
+		child := node.Child(i)
+		if onlyNamed && !child.IsNamed() {
+			continue
+		}
 
-		inner := Format(node.Child(i), depth+1)
+		fieldName := node.FieldNameForChild(i)
+		inner := Format(child, depth+1, onlyNamed)
 		if fieldName != "" {
-			inner = fieldName + ": " + inner
+			inner = fmt.Sprintf("%d|%s: %s", i, fieldName, inner)
+		} else {
+			inner = fmt.Sprintf("%d: %s", i, inner)
 		}
 
 		text += strings.ReplaceAll(inner, "\n", "\n  ")

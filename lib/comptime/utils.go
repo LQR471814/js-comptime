@@ -1,8 +1,12 @@
 package comptime
 
-import sitter "github.com/smacker/go-tree-sitter"
+import (
+	sitter "github.com/smacker/go-tree-sitter"
+)
 
-// node is the "name" of variable_declarator
+const COMPTIME_KEYWORD = "$comptime"
+
+// node must be "array_pattern" | "identifier" | "object_pattern"
 func getDeclaredVars(node *sitter.Node, buff []byte) []string {
 	if node == nil {
 		return nil
@@ -11,6 +15,8 @@ func getDeclaredVars(node *sitter.Node, buff []byte) []string {
 	declared := []string{}
 	switch node.Type() {
 	case "identifier":
+		declared = append(declared, node.Content(buff))
+	case "shorthand_property_identifier_pattern":
 		declared = append(declared, node.Content(buff))
 	case "pair_pattern":
 		inner := getDeclaredVars(node.ChildByFieldName("value"), buff)
@@ -41,81 +47,59 @@ func parseLexicalDecl(node *sitter.Node, buff []byte) []string {
 	return declarations
 }
 
-// var constants = map[string]struct{}{
-// 	// primitives
-// 	"number":    {},
-// 	"string":    {},
-// 	"null":      {},
-// 	"undefined": {},
-// 	"true":      {},
-// 	"false":     {},
-
-// 	// assignment operators
-// 	"=":    {},
-// 	"+=":   {},
-// 	"-=":   {},
-// 	"*=":   {},
-// 	"/=":   {},
-// 	"%=":   {},
-// 	"**=":  {},
-// 	"++":   {},
-// 	"--":   {},
-// 	"<<=":  {},
-// 	">>=":  {},
-// 	">>>=": {},
-// 	"&=":   {},
-// 	"^=":   {},
-// 	"|=":   {},
-// 	"&&=":  {},
-// 	"||=":  {},
-// 	"??=":  {},
-
-// 	// comparison operators
-// 	"==":  {},
-// 	"!=":  {},
-// 	"===": {},
-// 	"!==": {},
-// 	">":   {},
-// 	"<":   {},
-// 	">=":  {},
-// 	"<=":  {},
-
-// 	// logical operators
-// 	"&&": {},
-// 	"||": {},
-// 	"!":  {},
-
-// 	// arithmetic operators
-// 	"+":  {},
-// 	"-":  {},
-// 	"*":  {},
-// 	"/":  {},
-// 	"%":  {},
-// 	"**": {},
-
-// 	// bitwise operators
-// 	"&":   {},
-// 	"|":   {},
-// 	"^":   {},
-// 	"~":   {},
-// 	"<<":  {},
-// 	">>":  {},
-// 	">>>": {},
-
-// 	// misc operators
-// 	"ternary_expression": {},
-// 	"unary_expression":   {},
-// }
-
-// func isConstant(node *sitter.Node) bool {
-// 	_, isConstant := constants[node.Type()]
-// 	return isConstant
-// }
-
-func isConstant(node *sitter.Node) bool {
-	switch node.Type() {
-	case "number", "string", "null", "undefined", "true", "false":
-		return true
+func resolve(id string, scope *Scope) bool {
+	for scope != nil {
+		for _, otherId := range scope.RuntimeDeclarations {
+			if otherId == id {
+				return false
+			}
+		}
+		for _, decl := range scope.ComptimeDeclarations {
+			for _, otherId := range decl.Identifiers {
+				if otherId == id {
+					return true
+				}
+			}
+		}
+		scope = scope.Parent
 	}
 	return false
+}
+
+func stringFromId(source []byte, node *sitter.Node) string {
+	if node.Type() == "identifier" {
+		return node.Content(source)
+	}
+	return ""
+}
+
+// returns the defined identifiers
+func getDefinedIdentifiers(node *sitter.Node, source []byte) []string {
+	switch node.Type() {
+	case "class_declaration",
+		"function_declaration",
+		"generator_function_declaration":
+		name := stringFromId(source, node.ChildByFieldName("name"))
+		return []string{name}
+	// variable declarations
+	case "lexical_declaration", "variable_declaration":
+		return parseLexicalDecl(node, source)
+	case "import_clause":
+		// todo
+	}
+	return nil
+}
+
+func getParameterIdentifiers(node *sitter.Node, source []byte) []string {
+	singleParam := node.ChildByFieldName("parameter")
+	if singleParam != nil {
+		return []string{singleParam.Content(source)}
+	} else {
+		params := node.ChildByFieldName("parameters")
+		var ids []string
+		for i := 0; i < int(params.NamedChildCount()); i++ {
+			ids = append(ids, getDeclaredVars(node, source)...)
+		}
+		return ids
+	}
 }

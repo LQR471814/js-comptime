@@ -1,241 +1,272 @@
 <program>
-  <labeled_statement>
-    label: <statement_identifier />
-    <: />
-    body: <lexical_declaration>
-      kind: <const />
-      <variable_declarator>
-        name: <identifier />
-        value: <= />
-        <number />
+  0: <labeled_statement>
+    0|label: <statement_identifier />
+    2|body: <lexical_declaration>
+      1: <variable_declarator>
+        0|name: <identifier />
+        2: <number />
       </variable_declarator>
     </lexical_declaration>
   </labeled_statement>
-  <labeled_statement>
-    label: <statement_identifier />
-    <: />
-    body: <function_declaration>
-      <function />
-      name: <identifier />
-      parameters: <formal_parameters>
-        <( />
-        <identifier />
-        <, />
-        <identifier />
-        <) />
+  1: <labeled_statement>
+    0|label: <statement_identifier />
+    2|body: <function_declaration>
+      1|name: <identifier />
+      2|parameters: <formal_parameters>
+        1: <identifier />
+        3: <identifier />
       </formal_parameters>
-      body: <statement_block>
-        <{ />
-        <return_statement>
-          <return />
-          <binary_expression>
-            left: <identifier />
-            operator: <** />
-            right: <number />
+      3|body: <statement_block>
+        1: <return_statement>
+          1: <binary_expression>
+            0|left: <identifier />
+            2|right: <number />
           </binary_expression>
         </return_statement>
-        <} />
       </statement_block>
     </function_declaration>
   </labeled_statement>
-  <labeled_statement>
-    label: <statement_identifier />
-    <: />
-    body: <lexical_declaration>
-      kind: <const />
-      <variable_declarator>
-        name: <identifier />
-        value: <= />
-        <string>
-          <" />
-          <string_fragment />
-          <" />
+  2: <labeled_statement>
+    0|label: <statement_identifier />
+    2|body: <lexical_declaration>
+      1: <variable_declarator>
+        0|name: <identifier />
+        2: <string>
+          1: <string_fragment />
         </string>
       </variable_declarator>
     </lexical_declaration>
   </labeled_statement>
-  <expression_statement>
-    <identifier />
+  3: <expression_statement>
+    0: <identifier />
   </expression_statement>
-  <expression_statement>
-    <assignment_expression>
-      left: <identifier />
-      <= />
-      right: <number />
+  4: <expression_statement>
+    0: <assignment_expression>
+      0|left: <identifier />
+      2|right: <number />
     </assignment_expression>
   </expression_statement>
-  <lexical_declaration>
-    kind: <const />
-    <variable_declarator>
-      name: <identifier />
-      value: <= />
-      <array>
-        <[ />
-        <identifier />
-        <, />
-        <number />
-        <] />
+  5: <lexical_declaration>
+    1: <variable_declarator>
+      0|name: <identifier />
+      2: <array>
+        1: <identifier />
+        3: <number />
       </array>
     </variable_declarator>
   </lexical_declaration>
-  <lexical_declaration>
-    kind: <const />
-    <variable_declarator>
-      name: <identifier />
-      value: <= />
-      <object>
-        <{ />
-        <shorthand_property_identifier />
-        <, />
-        <pair>
-          key: <computed_property_name>
-            <[ />
-            <identifier />
-            <] />
+  6: <lexical_declaration>
+    1: <variable_declarator>
+      0|name: <identifier />
+      2: <object>
+        1: <shorthand_property_identifier />
+        3: <pair>
+          0|key: <computed_property_name>
+            1: <identifier />
           </computed_property_name>
-          <: />
-          value: <identifier />
+          2|value: <identifier />
         </pair>
-        <} />
       </object>
     </variable_declarator>
   </lexical_declaration>
-  <expression_statement>
-    <call_expression>
-      function: <identifier />
-      arguments: <arguments>
-        <( />
-        <number />
-        <, />
-        <identifier />
-        <) />
+  7: <expression_statement>
+    0: <call_expression>
+      0|function: <identifier />
+      1|arguments: <arguments>
+        1: <number />
+        3: <identifier />
       </arguments>
     </call_expression>
   </expression_statement>
-  <expression_statement>
-    <binary_expression>
-      left: <number />
-      operator: <+ />
-      right: <identifier />
+  8: <expression_statement>
+    0: <binary_expression>
+      0|left: <number />
+      2|right: <identifier />
     </binary_expression>
   </expression_statement>
-  <expression_statement>
-    <binary_expression>
-      left: <identifier />
-      operator: <in />
-      right: <identifier />
+  9: <expression_statement>
+    0: <binary_expression>
+      0|left: <identifier />
+      2|right: <identifier />
     </binary_expression>
   </expression_statement>
-  <expression_statement>
-    <ternary_expression>
-      condition: <binary_expression>
-        left: <binary_expression>
-          left: <identifier />
-          operator: <% />
-          right: <number />
+  10: <expression_statement>
+    0: <ternary_expression>
+      0|condition: <binary_expression>
+        0|left: <binary_expression>
+          0|left: <identifier />
+          2|right: <number />
         </binary_expression>
-        operator: <=== />
-        right: <number />
+        2|right: <number />
       </binary_expression>
-      <? />
-      consequence: <identifier />
-      <: />
-      alternative: <undefined />
+      2|consequence: <identifier />
+      4|alternative: <undefined />
     </ternary_expression>
   </expression_statement>
-  <expression_statement>
-    <sequence_expression>
-      left: <identifier />
-      <, />
-      right: <call_expression>
-        function: <number />
-        arguments: <arguments>
-          <( />
-          <identifier />
-          <, />
-          <number />
-          <) />
+  11: <expression_statement>
+    0: <sequence_expression>
+      0|left: <identifier />
+      2|right: <call_expression>
+        0|function: <number />
+        1|arguments: <arguments>
+          1: <identifier />
+          3: <number />
         </arguments>
       </call_expression>
     </sequence_expression>
   </expression_statement>
-  <expression_statement>
-    <call_expression>
-      function: <call_expression>
-        function: <template_string>
-          <` />
-          <template_substitution>
-            <${ />
-            <identifier />
-            <} />
+  12: <expression_statement>
+    0: <call_expression>
+      0|function: <call_expression>
+        0|function: <template_string>
+          1: <template_substitution>
+            1: <identifier />
           </template_substitution>
-          <template_substitution>
-            <${ />
-            <number />
-            <} />
+          2: <template_substitution>
+            1: <number />
           </template_substitution>
-          <` />
         </template_string>
-        arguments: <arguments>
-          <( />
-          <arrow_function>
-            parameters: <formal_parameters>
-              <( />
-              <) />
+        1|arguments: <arguments>
+          1: <arrow_function>
+            0|parameters: <formal_parameters>
             </formal_parameters>
-            <=> />
-            body: <binary_expression>
-              left: <identifier />
-              operator: <* />
-              right: <number />
+            2|body: <binary_expression>
+              0|left: <identifier />
+              2|right: <number />
             </binary_expression>
           </arrow_function>
-          <) />
         </arguments>
       </call_expression>
-      arguments: <arguments>
-        <( />
-        <) />
+      1|arguments: <arguments>
       </arguments>
     </call_expression>
   </expression_statement>
-  <expression_statement>
-    <member_expression>
-      object: <identifier />
-      <. />
-      property: <property_identifier />
+  13: <expression_statement>
+    0: <member_expression>
+      0|object: <identifier />
+      2|property: <property_identifier />
     </member_expression>
   </expression_statement>
-  <expression_statement>
-    <subscript_expression>
-      object: <identifier />
-      <[ />
-      index: <identifier />
-      <] />
+  14: <expression_statement>
+    0: <subscript_expression>
+      0|object: <identifier />
+      2|index: <identifier />
     </subscript_expression>
   </expression_statement>
-  <expression_statement>
-    <update_expression>
-      argument: <identifier />
-      operator: <++ />
+  15: <expression_statement>
+    0: <subscript_expression>
+      0|object: <identifier />
+      2|index: <number />
+    </subscript_expression>
+  </expression_statement>
+  16: <expression_statement>
+    0: <update_expression>
+      0|argument: <identifier />
     </update_expression>
   </expression_statement>
-  <expression_statement>
-    <augmented_assignment_expression>
-      left: <identifier />
-      operator: <+= />
-      right: <number />
+  17: <expression_statement>
+    0: <augmented_assignment_expression>
+      0|left: <identifier />
+      2|right: <number />
     </augmented_assignment_expression>
   </expression_statement>
-  <expression_statement>
-    <unary_expression>
-      operator: <delete />
-      argument: <subscript_expression>
-        object: <identifier />
-        <[ />
-        index: <identifier />
-        <] />
+  18: <expression_statement>
+    0: <unary_expression>
+      1|argument: <subscript_expression>
+        0|object: <identifier />
+        2|index: <identifier />
       </subscript_expression>
     </unary_expression>
   </expression_statement>
+  19: <expression_statement>
+    0: <call_expression>
+      0|function: <identifier />
+      1|arguments: <template_string>
+        1: <template_substitution>
+          1: <sequence_expression>
+            0|left: <number />
+            2|right: <sequence_expression>
+              0|left: <number />
+              2|right: <number />
+            </sequence_expression>
+          </sequence_expression>
+        </template_substitution>
+      </template_string>
+    </call_expression>
+  </expression_statement>
+  20: <for_statement>
+    2|initializer: <lexical_declaration>
+      1: <variable_declarator>
+        0|name: <identifier />
+        2: <number />
+      </variable_declarator>
+    </lexical_declaration>
+    3|condition: <expression_statement>
+      0: <binary_expression>
+        0|left: <identifier />
+        2|right: <number />
+      </binary_expression>
+    </expression_statement>
+    4|increment: <update_expression>
+      0|argument: <identifier />
+    </update_expression>
+    6|body: <statement_block>
+    </statement_block>
+  </for_statement>
+  21: <for_in_statement>
+    3: <identifier />
+    5: <array>
+      1: <number />
+      3: <number />
+      5: <number />
+    </array>
+    7: <statement_block>
+    </statement_block>
+  </for_in_statement>
+  22: <while_statement>
+    1|condition: <parenthesized_expression>
+      1: <true />
+    </parenthesized_expression>
+    2|body: <statement_block>
+    </statement_block>
+  </while_statement>
+  23: <if_statement>
+    1|condition: <parenthesized_expression>
+      1: <unary_expression>
+        1|argument: <false />
+      </unary_expression>
+    </parenthesized_expression>
+    2|consequence: <statement_block>
+    </statement_block>
+  </if_statement>
+  24: <switch_statement>
+    1|value: <parenthesized_expression>
+      1: <true />
+    </parenthesized_expression>
+    2|body: <switch_body>
+      1: <switch_case>
+        1|value: <true />
+        3|body: <break_statement>
+        </break_statement>
+      </switch_case>
+      2: <switch_case>
+        1|value: <false />
+        3|body: <break_statement>
+        </break_statement>
+      </switch_case>
+    </switch_body>
+  </switch_statement>
+  25: <class_declaration>
+    1|name: <identifier />
+    2|body: <class_body>
+      1|member: <method_definition>
+        0|name: <property_identifier />
+        1|parameters: <formal_parameters>
+        </formal_parameters>
+        2|body: <statement_block>
+        </statement_block>
+      </method_definition>
+    </class_body>
+  </class_declaration>
 </program>
+

@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"io"
-	sitterutils "js-comptime/lib/sitter-utils"
+	sitterutils "jscomptime/lib/sitterutils"
 	"log"
 	"os"
 
@@ -18,6 +19,9 @@ func main() {
 		log.Fatal(err)
 	}
 
+	onlyNamed := flag.Bool("only-named", false, "Only show named nodes.")
+	flag.Parse()
+
 	parser := sitter.NewParser()
 	parser.SetLanguage(javascript.GetLanguage())
 	tree, err := parser.ParseCtx(context.Background(), nil, buff)
@@ -25,5 +29,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println(sitterutils.Format(tree.RootNode(), 0))
+	fmt.Println(sitterutils.Format(tree.RootNode(), 0, *onlyNamed))
 }

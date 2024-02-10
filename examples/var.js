@@ -16,7 +16,7 @@ $comptime: const a = 48484848, b = 3
 $comptime: let x
 $comptime: const [y, z] = [4, 3]
 
-console.log(
+console . log(
   "this is an inlined variable + the 32nd fibonacci number",
   unlabeledVariable + comptimeFibonacci(32),
 )
