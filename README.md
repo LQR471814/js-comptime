@@ -1,6 +1,6 @@
 ## jscomptime
 
-> A transpiler which adds compile-time evaluation, or partial evaluation to JavaScript.
+> A transpiler which adds compile time metaprogramming to javascript.
 
 Examples of how it should be used can be found under [examples](examples/)
 
