@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"io"
 	"jscomptime/lib/comptime"
+	"jscomptime/lib/jsenv"
 	"log"
 	"os"
 )
@@ -14,13 +17,21 @@ a comptime value can only be brought into runtime code in only 2 ways:
 */
 
 func main() {
+	log.SetFlags(log.Ltime | log.Lshortfile)
+
 	buff, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = comptime.Compile(buff)
+	env := jsenv.Nodejs{
+		Command: "node",
+	}
+
+	compiled, err := comptime.Compile(context.Background(), buff, env)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println(compiled)
 }

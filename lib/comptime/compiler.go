@@ -1,11 +1,12 @@
 package comptime
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"jscomptime/lib/jsenv"
-	"log"
 	"os"
 
 	sitter "github.com/smacker/go-tree-sitter"
@@ -124,7 +125,8 @@ func recurse(node *sitter.Node, scope *Scope, source []byte) childType {
 		childType := recurse(child, childScope, source)
 		if childType == type_comptime {
 			switch child.Type() {
-			case "generator_function",
+			case "identifier",
+				"generator_function",
 				"function",
 				"arrow_function",
 				"await_expression",
@@ -150,10 +152,28 @@ func recurse(node *sitter.Node, scope *Scope, source []byte) childType {
 	return type_invalid
 }
 
+type comptimeResultType = uint8
+
+const (
+	ct_type_region comptimeResultType = iota
+	ct_type_statement
+)
+
+type nodeRef struct {
+	resultType comptimeResultType
+	index      int
+}
+
+type comptimeResults struct {
+	defOrder   []nodeRef
+	statements []*sitter.Node
+	regions    []jsenv.EvalResult
+}
+
 func renderComptimeCode(
 	scope *Scope,
 	source []byte,
-	results *[]jsenv.EvalResult,
+	results *comptimeResults,
 	out io.Writer,
 ) error {
 	var err error
@@ -173,23 +193,52 @@ func renderComptimeCode(
 				return err
 			}
 		case DEF_COMPTIME_STATEMENT:
-			_, err = out.Write([]byte(scope.ComptimeStatements[ref.Index].Content(source)))
+			node := scope.ComptimeStatements[ref.Index]
+
+			results.statements = append(results.statements, node.Parent())
+			results.defOrder = append(results.defOrder, nodeRef{
+				resultType: ct_type_statement,
+				index:      len(results.statements) - 1,
+			})
+
+			_, err = out.Write([]byte(node.Content(source)))
 			if err != nil {
 				return err
 			}
 		case DEF_COMPTIME_DECLARATION:
-			_, err = out.Write([]byte(scope.ComptimeDeclarations[ref.Index].Node.Content(source)))
+			node := scope.ComptimeDeclarations[ref.Index].Node
+
+			results.statements = append(results.statements, node.Parent())
+			results.defOrder = append(results.defOrder, nodeRef{
+				resultType: ct_type_statement,
+				index:      len(results.statements) - 1,
+			})
+
+			_, err = out.Write([]byte(node.Content(source)))
 			if err != nil {
 				return err
 			}
 		case DEF_REGION:
 			regionNode := scope.Regions[ref.Index]
-			*results = append(*results, jsenv.EvalResult{Node: regionNode})
-			_, err = out.Write([]byte(fmt.Sprintf(
-				"export(\"%p\", %s)",
-				regionNode,
-				regionNode.Content(source),
-			)))
+
+			results.regions = append(results.regions, jsenv.EvalResult{
+				Node: regionNode,
+			})
+			regionId := len(results.regions) - 1
+			results.defOrder = append(results.defOrder, nodeRef{
+				resultType: ct_type_region,
+				index:      regionId,
+			})
+
+			export := fmt.Sprintf(
+				"__jscomptime_export_value(%d, %s)",
+				regionId, regionNode.Content(source),
+			)
+			if err != nil {
+				return err
+			}
+
+			_, err = out.Write([]byte(export))
 			if err != nil {
 				return err
 			}
@@ -202,29 +251,73 @@ func renderComptimeCode(
 	return nil
 }
 
-func Compile(source []byte) error {
+func Compile(ctx context.Context, source []byte, env jsenv.Env) (string, error) {
 	parser := sitter.NewParser()
 	parser.SetLanguage(javascript.GetLanguage())
 	tree, err := parser.ParseCtx(context.Background(), nil, source)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	root := &Scope{}
 	recurse(tree.RootNode(), root, source)
 
-	results := []jsenv.EvalResult{}
-	err = renderComptimeCode(root, source, &results, os.Stdout)
+	// Debug info
+	jsonScope := TransformToJSONScope(root, source)
+	serialized, err := json.Marshal(jsonScope)
 	if err != nil {
-		log.Fatal(err)
+		return "", err
+	}
+	err = os.WriteFile("debug.json", serialized, 0777)
+	if err != nil {
+		return "", err
 	}
 
-	// rendered := RenderJSONScope(root, source)
-	// serialized, err := json.MarshalIndent(rendered, "", "  ")
-	// if err != nil {
-	// 	return err
-	// }
-	// fmt.Println(string(serialized))
+	code := bytes.NewBuffer(nil)
+	results := comptimeResults{}
+	err = renderComptimeCode(root, source, &results, code)
+	if err != nil {
+		return "", err
+	}
 
-	return nil
+	err = env.Eval(ctx, code.String(), results.regions)
+	if err != nil {
+		return "", err
+	}
+
+	output := bytes.NewBuffer(nil)
+	cursor := 0
+
+	for _, res := range results.defOrder {
+		switch res.resultType {
+		case ct_type_region:
+			region := results.regions[res.index]
+
+			fmt.Printf("%s\t%s\n", region.Node.Content(source), region.Result)
+			fmt.Println(cursor, region.Node.StartByte())
+
+			_, err := output.Write(source[cursor:region.Node.StartByte()])
+			if err != nil {
+				return "", err
+			}
+			_, err = output.Write([]byte(region.Result))
+			if err != nil {
+				return "", err
+			}
+			cursor = int(region.Node.EndByte())
+		case ct_type_statement:
+			statement := results.statements[res.index]
+			_, err := output.Write(source[cursor:statement.StartByte()])
+			if err != nil {
+				return "", err
+			}
+			cursor = int(statement.EndByte())
+		}
+	}
+	_, err = output.Write(source[cursor:])
+	if err != nil {
+		return "", err
+	}
+
+	return output.String(), nil
 }

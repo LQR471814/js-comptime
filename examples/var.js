@@ -1,4 +1,4 @@
-$comptime: const { readFileSync: comptimeReadFileSync, access } = await import("fs")
+$comptime: const { readFileSync: comptimeReadFileSync, access } = require("fs")
 
 $comptime: function comptimeFibonacci(n) {
   let a = 0
@@ -20,4 +20,4 @@ console . log(
   "this is an inlined variable + the 32nd fibonacci number",
   unlabeledVariable + comptimeFibonacci(32),
 )
-console.log("README.md", comptimeReadFileSync("README.md", "utf8"))
+console.log("README.md", comptimeReadFileSync("go.mod", "utf8"))

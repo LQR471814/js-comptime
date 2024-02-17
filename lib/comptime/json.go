@@ -18,7 +18,7 @@ type JSONScope struct {
 	Regions         []string              `json:"regions"`
 }
 
-func RenderJSONScope(scope *Scope, source []byte) JSONScope {
+func TransformToJSONScope(scope *Scope, source []byte) JSONScope {
 	definitionOrder := make([]JSONStatementRef, len(scope.DefinitionOrder))
 	for i, s := range scope.DefinitionOrder {
 		t := ""
@@ -56,7 +56,7 @@ func RenderJSONScope(scope *Scope, source []byte) JSONScope {
 
 	children := make([]JSONScope, len(scope.Scopes))
 	for i, c := range scope.Scopes {
-		children[i] = RenderJSONScope(c, source)
+		children[i] = TransformToJSONScope(c, source)
 	}
 
 	return JSONScope{
