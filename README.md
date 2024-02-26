@@ -133,6 +133,49 @@ const fooPrinter = () => console.log("foobarfoobar")
 fooPrinter()
 ```
 
+### Code expansion
+
+Conditional statements and loops can be expanded with the `$expand:` label.
+
+```js
+// before build
+$comptime: const configuration = {
+  verboseLogs: true,  
+  feature1: {
+    enabled: true
+  },
+  feature2: {
+    enabled: true,
+    serveOn: ["127.0.0.1", "0.0.0.0"],
+  },
+}
+
+$expand: if (configuration.verboseLogs) {
+  console.log("verbose logging enabled.")
+}
+window.features = {}
+$expand: for (const key in configuration) {
+  window.features[key] = configuration[key]
+}
+```
+
+```js
+// after build
+{
+  console.log("verbose logging enabled.")
+}
+window.features = {}
+{
+  window.features["verboseLogs"] = true
+}
+{
+  window.features["feature1"] = { enabled: true }
+}
+{
+  window.features["feature2"] = { enabled: true, serveOn: ["127.0.0.1", "0.0.0.0"] }
+}
+```
+
 ### Implementation
 
 1. For each scope.
