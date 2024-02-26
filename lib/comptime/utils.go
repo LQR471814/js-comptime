@@ -1,6 +1,8 @@
 package comptime
 
 import (
+	"context"
+
 	sitter "github.com/smacker/go-tree-sitter"
 )
 
@@ -74,7 +76,7 @@ func stringFromId(source []byte, node *sitter.Node) string {
 }
 
 // returns the defined identifiers
-func getDefinedIdentifiers(node *sitter.Node, source []byte) []string {
+func definedIdentifiers(node *sitter.Node, source []byte) []string {
 	switch node.Type() {
 	case "class_declaration",
 		"function_declaration",
@@ -103,3 +105,4 @@ func getParameterIdentifiers(node *sitter.Node, source []byte) []string {
 		return ids
 	}
 }
+

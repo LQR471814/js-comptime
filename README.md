@@ -68,6 +68,22 @@ console.log("foo")
 
 > The reason why `console.log(...)` isn't also executed at compile time and the build result being an empty file is because one of its dependencies is the runtime function `console.log`. Obviously, the dependencies of a function execution also include the function being executed. Operations like `+` and `-` can be considered constant, but something like `console.log` which pertains to the execution environment cannot be considered constant.
 
+> Note: "constant statements" will not be executed at compile time, so something like this would not work. This is because of the complexity that lies within tracking mutations, therefore it's better just not to support it.
+
+```js
+// before build
+let x = 0
+x += 1
+x += 2
+console.log(x)
+
+// after build
+let x = 0
+x += 1
+x += 2
+console.log(x)
+```
+
 Objects and arrays can also be returned by `$comptime`, however all their properties/elements must also be inlined.
 
 ```js
@@ -115,56 +131,6 @@ fooPrinter()
 // after build
 const fooPrinter = () => console.log("foobarfoobar")
 fooPrinter()
-```
-
-#### Conditional generation
-
-Code can also be generated conditionally with `if-statements`, the body of the if statement is treated as runtime code, the expression is a comptime statement that determines if the runtime code will be generated or not. To ensure that variables don't conflict with the outside scope, generated code will always be wrapped in a `{ scope }`.
-
-```js
-// before build
-$comptime: const verbose = process.env.VERBOSE
-$comptime: if (verbose === "true") {
-  console.log("verbose logging...")
-}
-console.log("hello world")
-```
-
-```js
-// after build VERBOSE=true
-{
-  console.log("verbose logging...")
-}
-console.log("hello world")
-```
-
-```js
-// after build VERBOSE=false
-console.log("hello world")
-```
-
-Code can also be generated repeatedly with `for/while` loops, similarly, generated code will be wrapped in a `{ scope }`.
-
-```js
-// before build
-const db = someOrm(...)
-$comptime: const tableNames = ["user", "student", "teacher"]
-$comptime: for (const table of tableNames) {
-  db.delete(table).run()
-}
-```
-
-```js
-// after build
-{
-  db.delete("user").run()
-}
-{
-  db.delete("student").run()
-}
-{
-  db.delete("teacher").run()
-}
 ```
 
 ### Implementation

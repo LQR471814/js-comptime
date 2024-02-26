@@ -14,7 +14,7 @@ import (
 )
 
 func handleComptimeBody(node *sitter.Node, scope *Scope, source []byte) {
-	ids := getDefinedIdentifiers(node, source)
+	ids := definedIdentifiers(node, source)
 	if len(ids) > 0 {
 		scope.addComptimeDeclaration(VarDeclarations{
 			Identifiers: ids,
@@ -41,7 +41,7 @@ func recurse(node *sitter.Node, scope *Scope, source []byte) childType {
 	}
 
 	// handle runtime var declarations
-	ids := getDefinedIdentifiers(node, source)
+	ids := definedIdentifiers(node, source)
 	if len(ids) > 0 {
 		scope.RuntimeDeclarations = append(scope.RuntimeDeclarations, ids...)
 	} else {
